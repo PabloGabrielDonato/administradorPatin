@@ -49,7 +49,7 @@
                                 {{ $cuota->updated_at->format('d/m/Y H:i:s') }}
                             </td>
                             <td>
-                                @foreach($cuota->disciplinas() as $disciplina)
+                                @foreach($cuota->alumno->disciplinas as $disciplina)
                                     {{ $disciplina->nombre }}: ${{ $disciplina->precio }}<br>
                                 @endforeach
                             </td>

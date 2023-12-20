@@ -58,18 +58,25 @@ class CuotaController extends Controller
     // app/Http/Controllers/CuotaController.php
 
     public function updateEstadoPago(Request $request, Cuota $cuota)
-    {
-        $request->validate([
-            'estado_pago' => 'required|in:pagada,no_pagada,pendiente,no_corresponde',
-        ]);
-    
-        $cuota->update([
-            'estado_pago' => $request->estado_pago,
-            'fecha_modificacion' => ($request->estado_pago === 'pagada') ? now() : null,
-        ]);
-    
-        return redirect()->back()->with('success', 'Estado de pago actualizado exitosamente');
-    }
+{
+    $request->validate([
+        'estado_pago' => 'required|in:pagada,no_pagada,pendiente,no_corresponde',
+    ]);
+
+    info("Antes de la actualización - Estado de pago: " . $cuota->estado_pago);
+    info("Antes de la actualización - Fecha de modificación: " . $cuota->fecha_modificacion);
+
+    $cuota->update([
+        'estado_pago' => $request->estado_pago,
+        'fecha_modificacion' => ($request->estado_pago === 'pagada') ? now() : null,
+    ]);
+
+    info("Después de la actualización - Estado de pago: " . $cuota->estado_pago);
+    info("Después de la actualización - Fecha de modificación: " . $cuota->fecha_modificacion);
+
+    return redirect()->back()->with('success', 'Estado de pago actualizado exitosamente');
+}
+
     
 
     // Puedes agregar más métodos según tus necesidades

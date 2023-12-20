@@ -59,25 +59,55 @@ class AlumnoController extends Controller
 
 
     public function update(Request $request, Alumno $alumno)
-    {
-        $request->validate([
-            'nombre' => 'required',
-            'apellido' => 'required',
-            'dni' => 'required',
-            'disciplinas' => 'array', // Asegúrate de que 'disciplinas' sea un array
-        ]);
+{
+    $request->validate([
+        'nombre' => 'required',
+        'apellido' => 'required',
+        'dni' => 'required',
+        'disciplinas' => 'array',
+    ]);
 
-        $alumno->update([
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'dni' => $request->dni,
-        ]);
+    // Obtén el total actual de las cuotas pagadas
+    $cuotasPagadas = $alumno->cuotas()->where('estado_pago', 'pagada')->get();
 
-        // Sincroniza las disciplinas del alumno
-        $alumno->disciplinas()->sync($request->disciplinas);
+    // Almacena temporalmente los totales de las cuotas pagadas
+    $totalesCuotasPagadas = $cuotasPagadas->pluck('total', 'id')->toArray();
 
-        return redirect()->route('alumnos.index')->with('success', 'Alumno actualizado exitosamente');
+    // Antes de la actualización, imprime solo los nombres de las disciplinas
+    $disciplinasNombres = $alumno->disciplinas->pluck('nombre')->toArray();
+    info("Disciplinas antes de la actualización: " . implode(', ', $disciplinasNombres));
+
+    // Imprime información esencial de las cuotas pagadas
+    foreach ($cuotasPagadas as $cuota) {
+        info("Cuota pagada: Mes={$cuota->mes}, Total={$cuota->total}");
     }
+
+    // Actualiza el alumno
+    $alumno->update([
+        'nombre' => $request->nombre,
+        'apellido' => $request->apellido,
+        'dni' => $request->dni,
+    ]);
+
+    // Sincroniza las disciplinas del alumno
+    $alumno->disciplinas()->sync($request->disciplinas);
+
+    // Vuelve a establecer los totales de las cuotas pagadas
+    foreach ($cuotasPagadas as $cuota) {
+        // Verifica si la cuota está marcada como pagada y evita la actualización
+        if ($cuota->estado_pago === 'pagada' && array_key_exists($cuota->id, $totalesCuotasPagadas)) {
+            $cuota->update(['total' => $totalesCuotasPagadas[$cuota->id]]);
+        }
+    }
+
+    return redirect()->route('alumnos.index')->with('success', 'Alumno actualizado exitosamente');
+}
+
+
+
+
+
+
 
     public function destroy(Alumno $alumno)
     {
@@ -86,12 +116,14 @@ class AlumnoController extends Controller
 
         return redirect()->route('alumnos.index')->with('success', 'Alumno eliminado exitosamente');
     }
+
+
     public function showCuotas(Alumno $alumno)
-    {
+{
     $cuotas = Cuota::where('alumno_id', $alumno->id)->get();
 
     return view('alumnos.show', compact('alumno', 'cuotas'));
-    }
+}
     
 
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cuota extends Model
 {
-    protected $fillable = ['mes', 'estado_pago']; // Agrega 'mes' al array fillable
+    protected $fillable = ['mes', 'estado_pago', 'total'];
     protected $dates = ['fecha_modificacion'];
 
     public function alumno()
@@ -14,13 +14,15 @@ class Cuota extends Model
         return $this->belongsTo(Alumno::class);
     }
 
-    public function disciplinas()
-    {
-        return $this->alumno->disciplinas;
-    }
-
+    // Método para calcular el total
     public function calcularTotal()
-    {
-        return $this->disciplinas()->sum('precio');
-    }
+{
+    // Obtén las disciplinas asociadas al alumno de esta cuota
+    $disciplinas = $this->alumno->disciplinas;
+
+    // Calcula el total sumando los precios de las disciplinas
+    $total = $disciplinas->sum('precio');
+
+    return $total;
+}
 }
