@@ -21,6 +21,9 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="{{ route('alumnos.index') }}">Alumnos</a>
                 </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{{ route('disciplinas.index') }}">Disciplinas</a>
+                </li>
                 <!-- Agrega más enlaces de navegación según sea necesario -->
             </ul>
         </div>

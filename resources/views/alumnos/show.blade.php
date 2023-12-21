@@ -50,10 +50,16 @@
                             </td>
                             <td>
                                 @foreach($cuota->alumno->disciplinas as $disciplina)
-                                    {{ $disciplina->nombre }}: ${{ $disciplina->precio }}<br>
+                                    {{ $disciplina->nombre }},<br>
                                 @endforeach
                             </td>
-                            <td>${{ $cuota->calcularTotal() }}</td>
+                            <td>
+                                @if ($cuota->estado_pago !== 'pagada')
+                                    ${{ $cuota->calcularTotal() }}
+                                @else
+                                    ${{ $cuota->total }}
+                                @endif
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>      
