@@ -4,35 +4,52 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AlumnoController;
 use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\DisciplinaController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\SessionsController;
 
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
 
-// RUTAS PROTEGIDAS
-Route::middleware('checkPassword')->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home');
-    Route::get('/alumnos.index', [AlumnoController::class, 'index'])->name('alumnos.index');
+// LOGIN Y REGISTER
 
-    // ... Otras rutas protegidas
-    Route::get('/alumnos.index', [AlumnoController::class, 'index'])->name('alumnos.index');
-    
+Route::get('login', [SessionsController::class, 'create'])->middleware('guest');
+Route::post('login', [SessionsController::class, 'store'])->middleware('guest');
+
+Route::post('logout', [SessionsController::class, 'destroy'])->middleware('auth');
+
+
+Route::get('register', [RegisterController::class, 'create'])->middleware('guest');
+Route::post('register', [RegisterController::class, 'store'])->middleware('guest');
+
+
+
+
+    //RUTA RAIZ
+    Route::get('/', [SessionsController::class, 'create']); // Cambiar la ruta raíz a la lista de alumnos
 
     //APARTADO ALUMNOS
-    Route::get('/alumnos/create', [AlumnoController::class, 'create'])->name('alumnos.create');
-    Route::get('/alumnos', [AlumnoController::class, 'index'])->name('alumnos.index');
-    Route::get('/alumnos/{alumno}', [AlumnoController::class, 'show'])->name('alumnos.show');
-    Route::get('/alumnos/{alumno}/edit', [AlumnoController::class, 'edit'])->name('alumnos.edit');
+    Route::get('/alumnos/create', [AlumnoController::class, 'create'])->name('alumnos.create')->middleware('auth');
+    Route::get('/alumnos/{alumno}', [AlumnoController::class, 'show'])->name('alumnos.show')->middleware('auth');
+    Route::get('/alumnos/{alumno}/edit', [AlumnoController::class, 'edit'])->name('alumnos.edit')->middleware('auth');
 
     // CUOTAS
-    Route::get('/alumnos/{alumno}/show-cuotas', [AlumnoController::class, 'showCuotas'])->name('alumnos.showCuotas');
+    Route::get('/alumnos/{alumno}/show-cuotas', [AlumnoController::class, 'showCuotas'])->name('alumnos.showCuotas')->middleware('auth');
     Route::put('/cuotas/{cuota}', [CuotaController::class, 'updateEstadoPago'])
-        ->name('cuotas.updateEstadoPago');
-
+        ->name('cuotas.updateEstadoPago')->middleware('auth');
+    
+    
     //RUTA DE RECURSOS
-    Route::resource('disciplinas', DisciplinaController::class);
-    Route::resource('alumnos', AlumnoController::class);
-});
+    
+    Route::resource('disciplinas', DisciplinaController::class)->middleware('auth');
+    Route::resource('alumnos', AlumnoController::class)->middleware('auth');
+
+
+

@@ -18,12 +18,27 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
+
+            @auth
+                <form action="/logout" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">CERRAR SESION</button>
+                </form>
                 <li class="nav-item active">
                     <a class="nav-link" href="{{ route('alumnos.index') }}">Alumnos</a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" href="{{ route('disciplinas.index') }}">Disciplinas</a>
                 </li>
+            @else
+                
+                <li class="nav-item active">
+                    <a class="nav-link" href="/login">Iniciar sesion</a>
+                </li> 
+
+
+            @endauth
+                
                 <!-- Agrega más enlaces de navegación según sea necesario -->
             </ul>
         </div>

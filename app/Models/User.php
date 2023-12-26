@@ -17,11 +17,9 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = [];
+
+    
     public function clave()
     {
         return $this->hasOne(Clave::class);
@@ -46,4 +44,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function setPasswordAttribute($password)
+    {   
+
+        // LUEGO DEL IGUAL SE PUEDE HARDCODEAR UNA PASSWORD CUALQUIERA
+        $this->attributes['password'] = bcrypt($password);
+    }
 }
